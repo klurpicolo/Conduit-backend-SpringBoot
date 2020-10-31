@@ -7,19 +7,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Getter
-@Setter
-@EqualsAndHashCode(of = {"body"})
 @Entity
+@Getter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tag {
+@EqualsAndHashCode(of = {"id"})
+public class UserFollowing {
 
     @Id
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String id;
-    private String body;
+    private String userId;
+    private String followingUserId;
 
 }

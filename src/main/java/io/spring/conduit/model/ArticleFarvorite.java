@@ -7,19 +7,22 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+@Entity(name = "ARTICLE_FARVORITE")
 @Getter
-@Setter
-@EqualsAndHashCode(of = {"body"})
-@Entity
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tag {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class ArticleFarvorite {
 
     @Id
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String id;
-    private String body;
+    @EqualsAndHashCode.Include
+    private String userId;
+    @EqualsAndHashCode.Include
+    private String articleId;
 
 }

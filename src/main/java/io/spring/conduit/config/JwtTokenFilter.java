@@ -1,0 +1,61 @@
+package io.spring.conduit.config;
+
+import io.spring.conduit.core.jwt.JwtService;
+import io.spring.conduit.core.user.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Optional;
+
+public class JwtTokenFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtService jwtService;
+
+    private String headerKey = "Authorization";
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        getToken(request.getHeader(headerKey)).ifPresent(
+            token -> jwtService.getSubjectFromToken(token).ifPresent(id -> {
+                if (SecurityContextHolder.getContext().getAuthentication() == null){
+                    userRepository.findById(id).ifPresent(user -> {
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                Collections.emptyList()
+                        );
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    });
+                }
+            })
+        );
+        filterChain.doFilter(request, response);
+    }
+
+    private Optional<String> getToken(String header){
+        if(header == null){
+            return Optional.empty();
+        } else {
+            String[] parts = header.split(" ");
+            if(parts.length != 2){
+                return Optional.empty();
+            } else {
+                return Optional.ofNullable(parts[1]);
+            }
+        }
+    }
+}

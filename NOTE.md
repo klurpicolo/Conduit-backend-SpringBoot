@@ -31,6 +31,8 @@ ER diagram
 **_Remaining Task_**
 Articles
 -- article feed -> Done
--- article get by slug
--- article update by slug
--- article delete by slug
+-- article get by slug -> Done
+-- article update by slug -> Done
+-- article delete by slug -> Done
+-- favorite article -> Done
+-- unfavorite article -> Done
